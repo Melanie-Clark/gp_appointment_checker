@@ -1,5 +1,7 @@
 # GP New Appointment Notifications
 
+_Note: App currently under development_
+
 _Designed for macOS and TPP SystmOnline users only_
 
 This MacOS app sends an **e-mail notification** when **new GP appointments** become available via **SystmOnline**:
