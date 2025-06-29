@@ -10,14 +10,14 @@ https://systmonline.tpp-uk.com/2/MainMenu
 
 It uses Selenium to automate logging in to your GP surgery’s SystmOnline portal, checks the appointment list, and notifies you when a new appointment becomes available.
 
-When the application is first run, the app will initially e-mail you a list of all available appointments, followed by any new appointments e-mail notifications as and when they become available (_whilst the application is running_).
+When the application is first run, the app will initially e-mail you a list of all available appointments, followed by e-mail notifications for any new appointments when they become available (_whilst the app is running_).
 
 ## Benefits
 As we all know GP surgeries are increasingly busy, and it can be difficult to get an appointment. This app helps by:
-- Reducing the manual effort of repetitively logging in and checking for new appointments
+- Reduction in manual effort from repetitive logging in and navigating to find new appointments
 - No need to remember your login details - Helpful if like me you keep forgetting them!
 - Perfect opportunity to grab that next available appointment before someone else
-- Saving you valuable time to continue with your day
+- Saving valuable time to continue with your day
 
 
 ## Dependencies
@@ -62,3 +62,20 @@ Install ChromeDriver command:
 
 ### 4. Install Python Packages
 `pip install -r requirements.txt`
+
+### 5. Create a .env file in the project directory
+
+```
+USERNAME=myusername
+PASSWORD=mypassword
+EMAIL_FROM=myemail@gmail.com
+EMAIL_TO=myemail@gmail.com
+EMAIL_PASSWORD=my_google_app_password
+```
+
+Note: Use a Gmail App Password, not your Gmail password:
+
+[Setup a Gmail App password](https://myaccount.google.com/apppasswords?pli=1&rapt=AEjHL4OTQNPYQgK_TJG1WYmBJ9wLe7CicYCs3AflM7ew7Ft9ttIbiV5Ute5lvWbxsy_8Iwo2Bq7DbrmFh3sZj4xY4jg5RaGhkEEygwHyFV4Ry_V8_atz5mI)
+
+### 6. Install dotenv
+`pip install python-dotenv`
