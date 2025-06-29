@@ -1,26 +1,32 @@
+import os
 import time
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
+from dotenv import load_dotenv
 
-# ------ CONFIGURATION ------
+# ------ CONFIGURATION --------
 
-USERNAME = 'username'
-PASSWORD = 'password'
+load_dotenv(override=True)  # loads variables from .env file
 
-EMAIL_FROM = 'from email'
-EMAIL_TO = 'to email'
+USERNAME = os.getenv('USERNAME')
+PASSWORD = os.getenv('PASSWORD')
+
+EMAIL_FROM = os.getenv('EMAIL_FROM')
+EMAIL_TO = os.getenv('EMAIL_TO')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+
 EMAIL_SUBJECT = '🩺 New GP Appointment Available!'
-EMAIL_PASSWORD = 'app password'
 
 APPT_FILE = '/tmp/last_appointments.txt'
 LOG_FILE = '/tmp/systm_log.err'
 
 # Skip if out of hours (before 8am or after 6pm) -----------
 hour = datetime.now().hour
-if hour < 8 or hour > 21:  # 21 for testing purposes
+if hour < 8 or hour > 24:  # changed for testing purposes
+    print("App is being run outside of configured hours")
     exit(0)
 
 # Chrome headless config
