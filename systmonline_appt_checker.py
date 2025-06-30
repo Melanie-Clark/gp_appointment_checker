@@ -1,13 +1,15 @@
 import os
+import pandas as pd
 import time
 from datetime import datetime
+from dotenv import load_dotenv
+from random import randint
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
-from dotenv import load_dotenv
-import pandas as pd
 from tabulate import tabulate
+
 
 # ------ CONFIGURATION --------
 
@@ -61,30 +63,31 @@ def main():
         driver.find_element(By.NAME, "Username").send_keys(USERNAME)
         driver.find_element(By.NAME, "Password").send_keys(PASSWORD)
         driver.find_element(By.ID, "button").click()
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
         # Book Appointment hyperlink
         driver.find_element(By.ID, "htmlbut").click()
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
         # Select available weeks for the next 3 weeks - TBC
         driver.find_element(By.ID, "button").click()
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
 
 
         # ----------- Add 1st 3 week available appointments to a complete 6 week list, if no appts...no entry--------------------
+        # add error message if unable to find html element
 
 
 
         # Select available weeks for 3-6 weeks - TBC
         select = Select(driver.find_element(By.NAME, "StartDate"))
         select.select_by_index(1)
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
         # Show (appointments) button
         driver.find_element(By.ID, "button").click()
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
         # Used to find the table names for each table
         # tables = driver.find_elements(By.TAG_NAME, "table")
