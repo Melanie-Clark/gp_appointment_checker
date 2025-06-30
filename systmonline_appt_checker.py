@@ -1,11 +1,15 @@
 import os
+import pandas as pd
 import time
 from datetime import datetime
+from dotenv import load_dotenv
+from random import randint
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
-from dotenv import load_dotenv
+from tabulate import tabulate
+
 
 # ------ CONFIGURATION --------
 
@@ -59,30 +63,31 @@ def main():
         driver.find_element(By.NAME, "Username").send_keys(USERNAME)
         driver.find_element(By.NAME, "Password").send_keys(PASSWORD)
         driver.find_element(By.ID, "button").click()
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
         # Book Appointment hyperlink
         driver.find_element(By.ID, "htmlbut").click()
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
         # Select available weeks for the next 3 weeks - TBC
         driver.find_element(By.ID, "button").click()
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
 
 
-        # Add available appointments 6 week list, if none...no entry
+        # ----------- Add 1st 3 week available appointments to a complete 6 week list, if no appts...no entry--------------------
+        # add error message if unable to find html element
 
 
 
         # Select available weeks for 3-6 weeks - TBC
         select = Select(driver.find_element(By.NAME, "StartDate"))
         select.select_by_index(1)
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
         # Show (appointments) button
         driver.find_element(By.ID, "button").click()
-        time.sleep(1)
+        time.sleep(randint(1,5))
 
         # Used to find the table names for each table
         # tables = driver.find_elements(By.TAG_NAME, "table")
@@ -95,12 +100,29 @@ def main():
         tables = driver.find_elements(By.TAG_NAME, "table")
         appt_table = tables[5]
         appt_data = appt_table.text.strip()
-        print(appt_data)
+        # print(appt_data)
 
-        # remove additional View lines
-        # align headers
+        # Extract table rows
+        rows = appt_table.find_elements(By.TAG_NAME, "tr")
+        data = []
+        for row in rows:
+            cells = row.find_elements(By.TAG_NAME, "th") or row.find_elements(By.TAG_NAME, "td")
+            row_data = [cell.text.strip() for cell in cells]
 
+            # Remove last column
+            row_data = row_data[:-1]
+            data.append(row_data)
 
+        # Separate headers and body
+        headers = data[0]
+        rows = data[1:]
+
+        # Create DataFrame
+        df = pd.DataFrame(rows, columns=headers)
+
+        # format table to remove row index numbers
+        # df_formatted = df.to_string(index=False)
+        print(tabulate(df, headers='keys', tablefmt='grid', showindex=False))
 
     except Exception as e:
         log_error(str(e))
