@@ -76,6 +76,3 @@ EMAIL_PASSWORD=my_google_app_password
 Note: Use a Gmail App Password, not your Gmail password:
 
 [Setup a Gmail App password](https://myaccount.google.com/apppasswords?pli=1&rapt=AEjHL4OTQNPYQgK_TJG1WYmBJ9wLe7CicYCs3AflM7ew7Ft9ttIbiV5Ute5lvWbxsy_8Iwo2Bq7DbrmFh3sZj4xY4jg5RaGhkEEygwHyFV4Ry_V8_atz5mI)
-
-### 6. Install dotenv
-`pip install python-dotenv`
