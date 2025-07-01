@@ -1,14 +1,16 @@
-import pandas as pd
 import time
-from config import Config
 from datetime import datetime
 from random import randint
+
+import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
 from tabulate import tabulate
+
+from config import Config
 
 
 class GPAppointmentChecker:
@@ -36,11 +38,11 @@ class GPAppointmentChecker:
     self.driver.get("https://systmonline.tpp-uk.com/")
     time.sleep(1)
 
-    # Completes login screen
     self.driver.find_element(By.NAME, "Username").send_keys(Config.USERNAME)
     self.driver.find_element(By.NAME, "Password").send_keys(Config.PASSWORD)
     self.driver.find_element(By.ID, "button").click()
     time.sleep(randint(1,5))
+    return "login"
 
   def appointment_navigation(self):
     # Book Appointment hyperlink
@@ -120,20 +122,24 @@ class GPAppointmentChecker:
         return
 
     try:
-      self.login()
+      Config.validate()
+      login = self.login()
       self.appointment_navigation()
       data = self.extract_appointments()
       self.save_appointment_data(data)
       
     # If no element exists on webpage
     except NoSuchElementException as e:
-          self.log_error(str(e))
-          print(f"Error: {e}")
+      if login:
+        print("Check username and password. Failed to login")
+      else:
+        self.log_error(str(e))
+        print(f"Error: {e}")
     except Exception as e:
       self.log_error(f"General Exception: {str(e)}")
       print(f"Unexpected error: {e}")
     finally:
-          self.driver.quit()
+      self.driver.quit()
 
 if __name__ == "__main__":
     checker = GPAppointmentChecker()
