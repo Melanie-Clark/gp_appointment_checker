@@ -43,31 +43,18 @@ class GPAppointmentChecker:
     self.driver.find_element(By.ID, "button").click()
     time.sleep(randint(1,5))
     return "login"
-
+  
   def appointment_navigation(self):
+      self.click_book_appointment()
+      initial_appt_data = self.extract_appointments() # Extracts first two weeks appointment data (approx)
+      appt_data = self.other_appointment_date_ranges(initial_appt_data)
+      return appt_data
+
+  def click_book_appointment(self):
     # Book Appointment hyperlink
     self.driver.find_element(By.ID, "htmlbut").click()
     time.sleep(randint(1,5))
-    
-    # Extracts first two weeks appointment data (approx)
-    two_weeks_appt_data = self.extract_appointments()
-
-    # Select available appointments for the next set of 2 weeks (approx)
-    select = Select(self.driver.find_element(By.NAME, "StartDate"))
-    select.select_by_index(1)
-    time.sleep(randint(1,5))
-
-    # Show (appointments) button
-    self.driver.find_element(By.ID, "button").click()
-    time.sleep(randint(1,5))
-    
-    # Extracts first two weeks appointment data (approx)
-    last_two_weeks_data = self.extract_appointments()
-    
-    return two_weeks_appt_data, last_two_weeks_data
-
-
-
+          
   def extract_appointments(self):
     # Find the table names for each table
     # tables = driver.find_elements(By.TAG_NAME, "table")
@@ -92,11 +79,29 @@ class GPAppointmentChecker:
     
     return data
 
-  def save_appointment_data(self, data_first, data_second):
+  def other_appointment_date_ranges(self, appt_data):
+    # Select available appointments for the next set of 2 weeks (approx)
+    select = Select(self.driver.find_element(By.NAME, "StartDate"))
+    
+    # print(f"Number of date drop-down options: {len(select.options)}")
+    for i in range(1,len(select.options)):  
+      select.select_by_index(i)
+      time.sleep(randint(1,5))
+
+      # Show (appointments) button
+      self.driver.find_element(By.ID, "button").click()
+      time.sleep(randint(1,5))
+      
+      # Extracts first two weeks appointment data (approx) excluding headers
+      appt_data += self.extract_appointments()[1:]
+      
+    return appt_data
+  
+  def save_appointment_data(self, appt_data):
     # Separate headers and body
     # print(data_first)
-    headers = data_first[0]
-    rows = data_first[1:] + data_second[1:]
+    headers = appt_data[0]
+    rows = appt_data[1:]
 
     # Create DataFrame
     df = pd.DataFrame(rows, columns=headers)
@@ -123,8 +128,8 @@ class GPAppointmentChecker:
     try:
       Config.validate()
       login = self.login()
-      data_first, data_second = self.appointment_navigation()     
-      self.save_appointment_data(data_first, data_second)
+      appt_data = self.appointment_navigation()     
+      self.save_appointment_data(appt_data)
       
     # If no element exists on webpage
     except NoSuchElementException as e:
