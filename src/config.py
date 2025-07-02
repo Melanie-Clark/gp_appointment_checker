@@ -15,7 +15,7 @@ class Config:
   EMAIL_SUBJECT = '🩺 New GP Appointment Available!'
 
   APPT_FILE = '/tmp/available_appointments.txt'
-  LOG_FILE = '/tmp/systm_log.err'
+  LOG_FILE = '/tmp/systm_log.txt'
   
   @classmethod
   def validate(cls):
