@@ -22,7 +22,7 @@ class GPAppointmentChecker:
     # Chrome headless config
     chrome_options = Options()
 
-    # chrome_options.add_argument("--headless=new") # Chrome runs in background
+    chrome_options.add_argument("--headless=new") # Chrome runs in background
 
     # Disables the Chrome sandbox security feature.
     # This is often necessary in some restricted environments or containerised setups, or to avoid errors on macOS when running ChromeDriver
@@ -98,15 +98,13 @@ class GPAppointmentChecker:
     return appt_data
   
   def save_appointment_data(self, appt_data):
-    # Separate headers and body
-    # print(data_first)
     headers = appt_data[0]
     rows = appt_data[1:]
 
     # Create DataFrame
     df = pd.DataFrame(rows, columns=headers)
 
-    # format table (showindex - removes row index numbers)
+    # Format table (showindex - removes row index numbers)
     formatted_table = (tabulate(df, headers='keys', tablefmt='grid', showindex=False))
     print(formatted_table)
 
@@ -121,7 +119,7 @@ class GPAppointmentChecker:
   def run(self):
     # Skip if out of hours (before 8am or after 6pm) -----------
     hour = datetime.now().hour
-    if hour < 8 or hour > 24:  # changed for testing purposes
+    if hour < 8 or hour > 23:  # changed for testing purposes
         print("App is being run outside of configured hours")
         return
 
