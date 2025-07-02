@@ -22,7 +22,7 @@ class GPAppointmentChecker:
     # Chrome headless config
     chrome_options = Options()
 
-    # chrome_options.add_argument("--headless=new") # Chrome runs in background
+    chrome_options.add_argument("--headless=new") # Chrome runs in background
 
     # Disables the Chrome sandbox security feature.
     # This is often necessary in some restricted environments or containerised setups, or to avoid errors on macOS when running ChromeDriver
@@ -43,34 +43,18 @@ class GPAppointmentChecker:
     self.driver.find_element(By.ID, "button").click()
     time.sleep(randint(1,5))
     return "login"
-
+  
   def appointment_navigation(self):
+      self.click_book_appointment()
+      initial_appt_data = self.extract_appointments() # Extracts first two weeks appointment data (approx)
+      appt_data = self.other_appointment_date_ranges(initial_appt_data)
+      return appt_data
+
+  def click_book_appointment(self):
     # Book Appointment hyperlink
     self.driver.find_element(By.ID, "htmlbut").click()
     time.sleep(randint(1,5))
-
-    # Select available weeks for the next 3 weeks - TBC--------
-    self.driver.find_element(By.ID, "button").click()
-    time.sleep(randint(1,5))
-
-
-
-    # ----------- Add 1st 3 week available appointments to a complete 6 week list, if no appts...no entry--------------------
-    # add error message if unable to find html element
-
-
-
-    # Select available weeks for 3-6 weeks - TBC-----------------
-    select = Select(self.driver.find_element(By.NAME, "StartDate"))
-    select.select_by_index(1)
-    time.sleep(randint(1,5))
-
-    # Show (appointments) button
-    self.driver.find_element(By.ID, "button").click()
-    time.sleep(randint(1,5))
-
-
-
+          
   def extract_appointments(self):
     # Find the table names for each table
     # tables = driver.find_elements(By.TAG_NAME, "table")
@@ -95,14 +79,32 @@ class GPAppointmentChecker:
     
     return data
 
-  def save_appointment_data(self, data):
-    # Separate headers and body
-    headers, rows = data[0], data[1:]
+  def other_appointment_date_ranges(self, appt_data):
+    # Select available appointments for the next set of 2 weeks (approx)
+    select = Select(self.driver.find_element(By.NAME, "StartDate"))
+    
+    # print(f"Number of date drop-down options: {len(select.options)}")
+    for i in range(1,len(select.options)):  
+      select.select_by_index(i)
+      time.sleep(randint(1,5))
+
+      # Show (appointments) button
+      self.driver.find_element(By.ID, "button").click()
+      time.sleep(randint(1,5))
+      
+      # Extracts first two weeks appointment data (approx) excluding headers
+      appt_data += self.extract_appointments()[1:]
+      
+    return appt_data
+  
+  def save_appointment_data(self, appt_data):
+    headers = appt_data[0]
+    rows = appt_data[1:]
 
     # Create DataFrame
     df = pd.DataFrame(rows, columns=headers)
 
-    # format table (showindex - removes row index numbers)
+    # Format table (showindex - removes row index numbers)
     formatted_table = (tabulate(df, headers='keys', tablefmt='grid', showindex=False))
     print(formatted_table)
 
@@ -117,16 +119,15 @@ class GPAppointmentChecker:
   def run(self):
     # Skip if out of hours (before 8am or after 6pm) -----------
     hour = datetime.now().hour
-    if hour < 8 or hour > 24:  # changed for testing purposes
+    if hour < 8 or hour > 23:  # changed for testing purposes
         print("App is being run outside of configured hours")
         return
 
     try:
       Config.validate()
       login = self.login()
-      self.appointment_navigation()
-      data = self.extract_appointments()
-      self.save_appointment_data(data)
+      appt_data = self.appointment_navigation()     
+      self.save_appointment_data(appt_data)
       
     # If no element exists on webpage
     except NoSuchElementException as e:
