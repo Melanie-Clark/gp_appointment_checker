@@ -48,19 +48,11 @@ class GPAppointmentChecker:
     # Book Appointment hyperlink
     self.driver.find_element(By.ID, "htmlbut").click()
     time.sleep(randint(1,5))
+    
+    # Extracts first two weeks appointment data (approx)
+    two_weeks_appt_data = self.extract_appointments()
 
-    # Select available weeks for the next 3 weeks - TBC--------
-    self.driver.find_element(By.ID, "button").click()
-    time.sleep(randint(1,5))
-
-
-
-    # ----------- Add 1st 3 week available appointments to a complete 6 week list, if no appts...no entry--------------------
-    # add error message if unable to find html element
-
-
-
-    # Select available weeks for 3-6 weeks - TBC-----------------
+    # Select available appointments for the next set of 2 weeks (approx)
     select = Select(self.driver.find_element(By.NAME, "StartDate"))
     select.select_by_index(1)
     time.sleep(randint(1,5))
@@ -68,6 +60,11 @@ class GPAppointmentChecker:
     # Show (appointments) button
     self.driver.find_element(By.ID, "button").click()
     time.sleep(randint(1,5))
+    
+    # Extracts first two weeks appointment data (approx)
+    last_two_weeks_data = self.extract_appointments()
+    
+    return two_weeks_appt_data, last_two_weeks_data
 
 
 
@@ -95,9 +92,11 @@ class GPAppointmentChecker:
     
     return data
 
-  def save_appointment_data(self, data):
+  def save_appointment_data(self, data_first, data_second):
     # Separate headers and body
-    headers, rows = data[0], data[1:]
+    # print(data_first)
+    headers = data_first[0]
+    rows = data_first[1:] + data_second[1:]
 
     # Create DataFrame
     df = pd.DataFrame(rows, columns=headers)
@@ -124,9 +123,8 @@ class GPAppointmentChecker:
     try:
       Config.validate()
       login = self.login()
-      self.appointment_navigation()
-      data = self.extract_appointments()
-      self.save_appointment_data(data)
+      data_first, data_second = self.appointment_navigation()     
+      self.save_appointment_data(data_first, data_second)
       
     # If no element exists on webpage
     except NoSuchElementException as e:
