@@ -10,6 +10,7 @@ from file_manager import FileManager
 from config import Config
 
 
+# Main file to run the SystmOnline GP Appointment Checker
 class GPAppointmentChecker:
   def __init__(self):
     self.browser = BrowserManager()
