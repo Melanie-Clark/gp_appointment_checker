@@ -3,21 +3,24 @@ from datetime import datetime
 
 from selenium.common.exceptions import NoSuchElementException
 
+from config import Config
 from browser_manager import BrowserManager
 from appointment_extractor import AppointmentExtractor
 from so_appt_nav import SystmOnlineGPAppointmentNavigator
 from file_manager import FileManager
-from config import Config
+from email_manager import EmailManager
 
 
 # Main file to run the SystmOnline GP Appointment Checker
 class GPAppointmentChecker:
   def __init__(self):
+    self.config = Config()
     self.browser = BrowserManager()
     self.driver = self.browser.driver
     self.extractor = AppointmentExtractor(self.driver)
     self.so_appt_nav = SystmOnlineGPAppointmentNavigator(self.driver, self.extractor)
     self.file_manager = FileManager()
+    self.email_manager = EmailManager()
     
   def run(self):
     # Skip if out of hours (before 8am or after 6pm) -----------
@@ -27,10 +30,11 @@ class GPAppointmentChecker:
         return
 
     try:
-      Config.validate()
+      self.config.validate()
       login = self.so_appt_nav.login()
       appt_data = self.so_appt_nav.appointment_navigation()     
-      self.file_manager.save_appointment_data(appt_data)
+      html_table = self.file_manager.save_appointment_data(appt_data)
+      self.email_manager.send_email(html_table)
       
     # If no element exists on webpage
     except NoSuchElementException as e:
@@ -44,6 +48,7 @@ class GPAppointmentChecker:
       traceback.print_exc()
     finally:
       self.driver.quit()
+
 
 if __name__ == "__main__":
     checker = GPAppointmentChecker()
