@@ -1,4 +1,4 @@
-# GP New Appointment Notifications
+# GP Appointment Checker
 
 _Note: App currently under development_
 
@@ -10,7 +10,7 @@ https://systmonline.tpp-uk.com/2/MainMenu
 
 It uses Selenium to automate logging in to your GP surgery’s SystmOnline portal, checks the appointment list, and notifies you when a new appointment becomes available.
 
-When the application is first run, the app will initially e-mail you a list of all available appointments, followed by e-mail notifications for any new appointments when they become available (_whilst the app is running_).
+When the application is first run, the app will initially e-mail you a list of all available appointments, followed by e-mail notifications when new appointments become available (_only while the app is running_).
 
 ## Benefits
 As we all know GP surgeries are increasingly busy, and it can be difficult to get an appointment. This app helps by:
@@ -19,6 +19,16 @@ As we all know GP surgeries are increasingly busy, and it can be difficult to ge
 - Perfect opportunity to grab that next available appointment before someone else
 - Saving valuable time to continue with your day
 
+## Important Note
+Please use this app in accordance with TPP's usage policy. This tool is intended for responsible, personal use only. It's recommended to run checks for a limited period of time or run checks hourly to avoid overloading the SystmOnline service.
+
+_"1.2 You may not use SystmOnline in an unlawful manner or any manner that could damage, disable, overburden, or impair SystmOnline (or servers or networks connected to SystmOnline), nor may you use SystmOnline in any manner that could interfere with any other party’s use and enjoyment of SystmOnline (or servers or networks connected to SystmOnline)"_
+
+<strong>Reference: </strong>\
+<em>[SystmOnline Terms of Use](https://systmonline.tpp-uk.com/Safeguarding/privacy/privacy.html)</em>
+
+**Disclaimer:**  
+<em>This project is not affiliated with or endorsed by TPP. Users are responsible for ensuring their use complies with all applicable terms, conditions, and laws.</em> 
 
 ## Dependencies
 - MacOS
