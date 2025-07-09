@@ -7,7 +7,7 @@ class AppointmentExtractor:
 
   def extract_appointments(self):
     # Find the table names for each table
-    # tables = driver.find_elements(By.TAG_NAME, "table")
+    # tables = self.driver.find_elements(By.TAG_NAME, "table")
     # for i, table in enumerate(tables):
     #     print(f"Table {i}:")
     #     print(table.text)
