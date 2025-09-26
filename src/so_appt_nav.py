@@ -13,7 +13,7 @@ class SystmOnlineNavigator:
     self.driver = driver
     self.extractor = extractor   
   
-  def login(self):
+  def login(self, file_manager):
     self.driver.get("https://systmonline.tpp-uk.com/")
     time.sleep(1)
 
@@ -21,7 +21,13 @@ class SystmOnlineNavigator:
     self.driver.find_element(By.NAME, "Password").send_keys(Config.PASSWORD)
     self.driver.find_element(By.ID, "button").click()
     time.sleep(randint(1,5))
-    return "login"
+
+    # checks for login error
+    error_span = self.driver.find_elements(By.ID, "errorText")
+    if error_span:
+        file_manager.log_error(error_span[0].text.strip())
+        self.driver.quit()
+        raise Exception("Check username and password. Failed to login")
   
   def appointment_navigation(self):
       self.click_book_appointment()

@@ -31,18 +31,10 @@ class GPAppointmentChecker:
 
     try:
       self.config.validate()
-      login = self.so_appt_nav.login()
+      self.so_appt_nav.login(self.file_manager)
       appt_data = self.so_appt_nav.appointment_navigation()     
       html_table = self.file_manager.save_appointment_data(appt_data)
       self.email_manager.send_email(html_table)
-      
-    # If no element exists on webpage
-    except NoSuchElementException as e:
-      if login:
-        print("Check username and password. Failed to login")
-      else:
-        self.file_manager.log_error(str(e))
-        traceback.print_exc()
     except Exception as e:
       self.file_manager.log_error(f"General Exception: {str(e)}")
       traceback.print_exc()
