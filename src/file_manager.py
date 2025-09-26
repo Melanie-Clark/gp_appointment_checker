@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 import pandas as pd
@@ -10,10 +9,15 @@ from config import Config
 # Manages saving data/logs to file and tabular formatting
 class FileManager:
   def save_appointment_data(self, appt_data):
-    html_table = self.table_formatter(appt_data)
-    with open(Config.APPT_FILE, 'w') as file:
-      file.write(html_table)
-    return html_table
+    if appt_data != 0:
+      html_table = self.table_formatter(appt_data)
+
+      with open(Config.APPT_FILE, 'w') as file:
+        file.write(html_table)
+      return html_table
+    else:
+      print("There are currently no available appointments.")
+      return "There are currently no available appointments."
   
   def table_formatter(self, appt_data):
     headers = appt_data[0]
@@ -35,9 +39,6 @@ class FileManager:
 
     # HTML left-align headers
     html_table = html_table.replace('<th>', '<th style="text-align:left;">')
-
-    # print("****************")
-    # print(html_table)
     return html_table
   
   # Error log (append)
