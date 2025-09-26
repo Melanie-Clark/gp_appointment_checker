@@ -6,7 +6,7 @@ from selenium.common.exceptions import NoSuchElementException
 from config import Config
 from browser_manager import BrowserManager
 from appointment_extractor import AppointmentExtractor
-from so_appt_nav import SystmOnlineGPAppointmentNavigator
+from so_appt_nav import SystmOnlineNavigator
 from file_manager import FileManager
 from email_manager import EmailManager
 
@@ -18,7 +18,7 @@ class GPAppointmentChecker:
     self.browser = BrowserManager()
     self.driver = self.browser.driver
     self.extractor = AppointmentExtractor(self.driver)
-    self.so_appt_nav = SystmOnlineGPAppointmentNavigator(self.driver, self.extractor)
+    self.so_appt_nav = SystmOnlineNavigator(self.driver, self.extractor)
     self.file_manager = FileManager()
     self.email_manager = EmailManager()
     
@@ -31,18 +31,13 @@ class GPAppointmentChecker:
 
     try:
       self.config.validate()
-      login = self.so_appt_nav.login()
+      self.so_appt_nav.login(self.file_manager, self.email_manager)
       appt_data = self.so_appt_nav.appointment_navigation()     
-      html_table = self.file_manager.save_appointment_data(appt_data)
-      self.email_manager.send_email(html_table)
-      
-    # If no element exists on webpage
-    except NoSuchElementException as e:
-      if login:
-        print("Check username and password. Failed to login")
+      appt_content = self.file_manager.save_appointment_data(appt_data)
+      if appt_data == 0:
+        self.email_manager.send_email("", appt_content, "No available GP appointments")
       else:
-        self.file_manager.log_error(str(e))
-        traceback.print_exc()
+        self.email_manager.send_email(appt_content)
     except Exception as e:
       self.file_manager.log_error(f"General Exception: {str(e)}")
       traceback.print_exc()
