@@ -6,7 +6,7 @@ from selenium.common.exceptions import NoSuchElementException
 from config import Config
 from browser_manager import BrowserManager
 from appointment_extractor import AppointmentExtractor
-from so_appt_nav import SystmOnlineGPAppointmentNavigator
+from so_appt_nav import SystmOnlineNavigator
 from file_manager import FileManager
 from email_manager import EmailManager
 
@@ -18,7 +18,7 @@ class GPAppointmentChecker:
     self.browser = BrowserManager()
     self.driver = self.browser.driver
     self.extractor = AppointmentExtractor(self.driver)
-    self.so_appt_nav = SystmOnlineGPAppointmentNavigator(self.driver, self.extractor)
+    self.so_appt_nav = SystmOnlineNavigator(self.driver, self.extractor)
     self.file_manager = FileManager()
     self.email_manager = EmailManager()
     

@@ -8,7 +8,7 @@ from config import Config
 
 
 # Navigates from the login screen to the 1st and 2nd available appointments data
-class SystmOnlineGPAppointmentNavigator:
+class SystmOnlineNavigator:
   def __init__(self, driver, extractor):
     self.driver = driver
     self.extractor = extractor   
