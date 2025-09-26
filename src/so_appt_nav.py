@@ -48,6 +48,6 @@ class SystmOnlineGPAppointmentNavigator:
       time.sleep(randint(1,5))
       
       # Extracts first two weeks appointment data (approx) excluding headers
-      appt_data += self.extractor.extract_appointments()[1:]
+      appt_data += self.extractor.extract_appointments()
       
     return appt_data
