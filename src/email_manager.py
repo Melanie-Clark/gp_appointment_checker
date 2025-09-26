@@ -1,5 +1,4 @@
 import smtplib
-import ssl
 from email.message import EmailMessage
 
 from config import Config
@@ -11,18 +10,19 @@ class EmailManager:
       self.config = Config()
 
   # E-mail To, From, Subject, Body
-  def send_email(self, html_table):
+  def send_email(self, content, content_title="Here are the available appointments at your GP practice:", title="🩺 Available GP Appointments"):
       try:
           email_msg = EmailMessage()
-          email_msg["Subject"] = self.config.EMAIL_SUBJECT
-          email_msg["From"] = self.config.EMAIL_FROM
           email_msg["To"] = self.config.EMAIL_TO
-          email_msg.set_content(html_table)
+          email_msg["From"] = self.config.EMAIL_FROM       
+          email_msg["Subject"] = title
+
+          email_msg.set_content(content)
           email_msg.add_alternative(f"""
           <html>
             <body>
-              <p>Here are the available appointments at your GP practice:</p>
-              {html_table}
+              <p>{content_title}</p>
+              {content}
             </body>
           </html>
           """, subtype='html')

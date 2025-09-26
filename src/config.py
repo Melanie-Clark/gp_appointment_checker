@@ -12,8 +12,6 @@ class Config:
   EMAIL_TO = os.getenv('EMAIL_TO')
   EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
-  EMAIL_SUBJECT = '🩺 New GP Appointment Available!'
-
   APPT_FILE = '/tmp/available_appointments.txt'
   LOG_FILE = '/tmp/systm_log.txt'
   

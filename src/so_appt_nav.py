@@ -14,7 +14,7 @@ class SystmOnlineNavigator:
     self.driver = driver
     self.extractor = extractor   
   
-  def login(self, file_manager):
+  def login(self, file_manager, email_manager):
     self.driver.get("https://systmonline.tpp-uk.com/")
     time.sleep(1)
 
@@ -28,7 +28,8 @@ class SystmOnlineNavigator:
     if error_span:
         file_manager.log_error(error_span[0].text.strip())
         self.driver.quit()
-        raise Exception("Check username and password. Failed to login")
+        email_manager.send_email("", "There has been a failed login attempt to SystmOnline. Please check your username and password in the .env file", "SystmOnline failed login attempt")
+        raise Exception("Failed login attempt. Please check your username and password in the .env file")
 
   def appointment_navigation(self):
       self.click_book_appointment()

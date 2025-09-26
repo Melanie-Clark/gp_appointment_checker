@@ -31,10 +31,13 @@ class GPAppointmentChecker:
 
     try:
       self.config.validate()
-      self.so_appt_nav.login(self.file_manager)
+      self.so_appt_nav.login(self.file_manager, self.email_manager)
       appt_data = self.so_appt_nav.appointment_navigation()     
-      html_table = self.file_manager.save_appointment_data(appt_data)
-      self.email_manager.send_email(html_table)
+      appt_content = self.file_manager.save_appointment_data(appt_data)
+      if appt_data == 0:
+        self.email_manager.send_email("", appt_content, "No available GP appointments")
+      else:
+        self.email_manager.send_email(appt_content)
     except Exception as e:
       self.file_manager.log_error(f"General Exception: {str(e)}")
       traceback.print_exc()
