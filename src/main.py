@@ -1,8 +1,6 @@
 import traceback
 from datetime import datetime
 
-from selenium.common.exceptions import NoSuchElementException
-
 from config import Config
 from browser_manager import BrowserManager
 from appointment_extractor import AppointmentExtractor
@@ -21,21 +19,22 @@ class GPAppointmentChecker:
     self.so_appt_nav = SystmOnlineNavigator(self.driver, self.extractor)
     self.file_manager = FileManager()
     self.email_manager = EmailManager()
+    self.no_appts = "There are currently no available appointments."
     
   def run(self):
-    # Skip if out of hours (before 8am or after 6pm) -----------
-    hour = datetime.now().hour
-    if hour < 8 or hour > 23:  # changed for testing purposes
-        print("App is being run outside of configured hours")
-        return
-
     try:
+      # Skip if out of hours (before 8am or after 6pm) -----------
+      hour = datetime.now().hour
+      if hour < 8 or hour > 18:  # changed for testing purposes
+        print("GP Appointment Checker has been run outside of configured hours. Update the hours in main.py or run during configured hours.")
+        return
+    
       self.config.validate()
       self.so_appt_nav.login(self.file_manager, self.email_manager)
       appt_data = self.so_appt_nav.appointment_navigation()     
       appt_content = self.file_manager.save_appointment_data(appt_data)
       if appt_data == 0:
-        self.email_manager.send_email("", appt_content, "No available GP appointments")
+        self.email_manager.send_email("", self.no_appts, self.no_appts)
       else:
         self.email_manager.send_email(appt_content)
     except Exception as e:

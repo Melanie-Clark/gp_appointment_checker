@@ -17,7 +17,8 @@ class FileManager:
       return html_table
     else:
       print("There are currently no available appointments.")
-      return "There are currently no available appointments."
+      # No appointments found
+      return 0
   
   def table_formatter(self, appt_data):
     headers = appt_data[0]
