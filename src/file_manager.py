@@ -8,7 +8,7 @@ from config import Config
      
 # Manages saving data/logs to file and tabular formatting
 class FileManager:
-  def save_appointment_data(self, appt_data):
+  def save_appointment_data(self, surgery_address, appt_data):
     if appt_data != 0:
       html_table = self.table_formatter(appt_data)
 
@@ -16,8 +16,9 @@ class FileManager:
         file.write(html_table)
       return html_table
     else:
-      print("There are currently no available appointments.")
-      return "There are currently no available appointments."
+      print(f"There are currently no available appointments at {surgery_address}.")
+      # No appointments found
+      return 0
   
   def table_formatter(self, appt_data):
     headers = appt_data[0]
