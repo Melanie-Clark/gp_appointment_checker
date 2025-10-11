@@ -12,7 +12,7 @@ from config import Config
 class SystmOnlineNavigator:
   def __init__(self, driver, extractor):
     self.driver = driver
-    self.extractor = extractor   
+    self.extractor = extractor
   
   def login(self, file_manager, email_manager):
     self.driver.get("https://systmonline.tpp-uk.com/")
@@ -32,7 +32,6 @@ class SystmOnlineNavigator:
         raise Exception("Failed login attempt. Please check your username and password in the .env file")
 
   def appointment_navigation(self):
-      self.click_book_appointment()
       appt_status = self.extractor.extract_appointments() # Extracts first two weeks appointment data (approx)
       appt_data = self.other_appointment_date_ranges(appt_status)
       # No available appointments
@@ -51,18 +50,28 @@ class SystmOnlineNavigator:
     # return 0 if no appointments
     try:
       select = Select(self.driver.find_element(By.NAME, "StartDate"))
+    
+      # print(f"Number of date drop-down options: {len(select.options)}")
+      for i in range(1,len(select.options)):  
+        select.select_by_index(i)
+        time.sleep(randint(1,5))
+
+        # Show (appointments) button
+        self.driver.find_element(By.ID, "button").click()
+        time.sleep(randint(1,5))
+        
+        # Extracts first two weeks appointment data (approx) excluding headers
+        appt_data += self.extractor.extract_appointments()
+      
+      select = Select(self.driver.find_element(By.NAME, "StartDate"))
+      select.select_by_index(0)      
+      time.sleep(randint(1, 2))
+      self.driver.find_element(By.ID, "button").click()
+      time.sleep(randint(1, 2))
+
     except NoSuchElementException:
        return 0
     
-    # print(f"Number of date drop-down options: {len(select.options)}")
-    for i in range(1,len(select.options)):  
-      select.select_by_index(i)
-      time.sleep(randint(1,5))
-
-      # Show (appointments) button
-      self.driver.find_element(By.ID, "button").click()
-      time.sleep(randint(1,5))
-      
-      # Extracts first two weeks appointment data (approx) excluding headers
-      appt_data += self.extractor.extract_appointments()
     return appt_data
+  
+
