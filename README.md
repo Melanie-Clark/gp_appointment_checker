@@ -17,7 +17,8 @@ As we all know GP surgeries are increasingly busy, and it can be difficult to ge
 - Reduction in manual effort from repetitive logging in and navigating to find new appointments
 - No need to remember your login details - Helpful if like me you keep forgetting them!
 - Perfect opportunity to grab that next available appointment before someone else
-- Saving valuable time to continue with your day
+- Saves valuable time to continue with your day
+- Sends a notification e-mail with new appointments
 
 ## Important Note
 Please use this app in accordance with TPP's usage policy. This tool is intended for responsible, personal use only. It's recommended to run checks for a limited period of time or run checks hourly to avoid overloading the SystmOnline service.
