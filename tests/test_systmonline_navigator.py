@@ -6,8 +6,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src'
 
 from unittest.mock import MagicMock
 from systmonline_navigator import SystmOnlineNavigator
-from file_manager import FileManager
-from email_manager import EmailManager
 
 
 class TestSystmOnlineNavigator(unittest.TestCase):
@@ -17,8 +15,8 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     driver, file_manager, and email_manager to isolate tests from real browser or emails.
     """
     self.mock_driver = MagicMock()         # MagicMock fakes the driver
-    self.file_manager = FileManager()
-    self.email_manager = EmailManager()
+    self.file_manager = MagicMock()
+    self.email_manager = MagicMock()      # Prevents live e-mails being sent
     self.navigator = SystmOnlineNavigator(self.mock_driver, extractor=None)
 
   # Test wrong username/password - failed login
@@ -49,6 +47,14 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     except Exception as e:
       # Fail the test if ANY exception is raised
       self.fail(f"login() raised an unexpected exception: {e}")
+
+  # Simulates no visible 'Book Appointment' button
+  def test_click_book_appointment_no_visible_button(self):
+    self.mock_driver.find_elements.return_value = []
+
+    # If there’s no visible button, next() will automatically raise StopIteration
+    with self.assertRaises(StopIteration):
+        self.navigator.click_book_appointment()
 
 
 if __name__ == "__main__":
