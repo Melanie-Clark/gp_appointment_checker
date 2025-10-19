@@ -56,6 +56,17 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     with self.assertRaises(StopIteration):
         self.navigator.click_book_appointment()
 
+  # Simulating visible click book appointment
+  def test_click_book_appointment_success(self):
+    mock_button = MagicMock()
+    mock_button.is_displayed.return_value = True
+    self.mock_driver.find_elements.return_value = [mock_button]
+
+    # This should run without errors
+    self.navigator.click_book_appointment()
+    # Verify click() was called on the button
+    mock_button.click.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()
