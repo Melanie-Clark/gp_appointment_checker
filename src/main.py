@@ -6,7 +6,7 @@ from datetime import datetime
 from config import Config
 from browser_manager import BrowserManager
 from appointment_extractor import AppointmentExtractor
-from so_appt_nav import SystmOnlineNavigator
+from systmonline_navigator import SystmOnlineNavigator
 from file_manager import FileManager
 from email_manager import EmailManager
 from surgery_info_extractor import SurgeryInfoExtractor
@@ -19,7 +19,7 @@ class GPAppointmentChecker:
     self.browser = BrowserManager()
     self.driver = self.browser.driver
     self.extractor = AppointmentExtractor(self.driver)
-    self.so_appt_nav = SystmOnlineNavigator(self.driver, self.extractor)
+    self.systmonline_navigator = SystmOnlineNavigator(self.driver, self.extractor)
     self.surgery_info = SurgeryInfoExtractor(self.driver)
     self.file_manager = FileManager()
     self.email_manager = EmailManager()
@@ -39,13 +39,13 @@ class GPAppointmentChecker:
       delay_time = 60
     
       self.config.validate()
-      self.so_appt_nav.login(self.file_manager, self.email_manager)
+      self.systmonline_navigator.login(self.file_manager, self.email_manager)
       surgery_address = self.surgery_info.extract_address()
 
       no_appt_text = self.no_appts + surgery_address
-      self.so_appt_nav.click_book_appointment()
+      self.systmonline_navigator.click_book_appointment()
       while True:
-        appt_data = self.so_appt_nav.appointment_navigation()     
+        appt_data = self.systmonline_navigator.appointment_navigation()     
         # error during loop -----------------------------------------
         appt_content = self.file_manager.save_appointment_data(surgery_address, appt_data)
         if appt_data == 0:
