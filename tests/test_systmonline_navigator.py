@@ -19,6 +19,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     self.email_manager = MagicMock()      # Prevents live e-mails being sent
     self.navigator = SystmOnlineNavigator(self.mock_driver, extractor=None)
 
+  # ---------------LOGIN----------------------
   # Test wrong username/password - failed login
   def test_login_failure(self):
     # Fakes the HTML element that would appear on login failure
@@ -48,6 +49,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
       # Fail the test if ANY exception is raised
       self.fail(f"login() raised an unexpected exception: {e}")
 
+  # ---------------BOOK APPOINTMENTS----------------------
   # Simulates no visible 'Book Appointment' button
   def test_click_book_appointment_no_visible_button(self):
     self.mock_driver.find_elements.return_value = []
