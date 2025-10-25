@@ -32,13 +32,14 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     # Mock Selenium driver.find_elements(By.ID, "errorText") - check if the login function thinks a failed login element exists
     self.mock_driver.find_elements.return_value = [error_element]
 
-    # We expect the code to raise Exception("Failed login attempt...") because the login “failed”
+    # Expect an exception - raise Exception("Failed login attempt...") because the login “failed”
     with self.assertRaises(Exception) as context:
         self.navigator.login(self.file_manager, self.email_manager)
 
-    # Confirms the exception message is the one we expect, so test passes
+    # Confirms the exception message is as expected - test passes
     self.assertIn("Failed login attempt", str(context.exception))
 
+  # Test correct username/password - successful login
   def test_login_successful(self):
     # Mock Selenium driver.find_elements(By.ID, "errorText") - check the login function thinks a successful login element exists
     self.mock_driver.find_elements.return_value = []
@@ -71,7 +72,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     mock_button.click.assert_called_once()
     
   # ---------------APPOINTMENT NAVIGATION----------------------
-  # No appointments available
+  # FAIL: No appointments available
   # other_appt_date_ranges from appointment_navigation() will have a separate test for the i/o, so mock in this scenario
   def test_appointment_navigation_no_appointments(self):
     self.mock_extractor.extract_appointments.return_value = []
@@ -82,11 +83,31 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     result = self.navigator.appointment_navigation()
 
     # Assert the result is 0 since no appointments are available
-    self.assertEqual(result, 0)
+    self.assertEqual(result, [])
 
     # Ensure extract_appointments() was called during test
     self.mock_extractor.extract_appointments.assert_called_once()
     self.navigator.other_appointment_date_ranges.assert_called_once()
+
+  # SUCCESS: Extract initial appointments, no other appointments
+  def test_appointment_navigation_with_appointments(self):
+    mock_result = [
+      {"Date": "Saturday 25th Oct 2025", "Earliest Time": "17:00", "Latest Time": "17:00", "Location": "Test location", "Clinician": "Dr. Smith", "Session Type": "Test session"},
+      {"Date": "Thursday 30th Oct 2025", "Earliest Time": "18:05", "Latest Time": "18:05", "Location": "Test location", "Clinician": "Dr. Jones", "Session Type": "Test session"}
+    ]
+    
+    self.mock_extractor.extract_appointments.return_value = mock_result
+
+    self.navigator.other_appointment_date_ranges = MagicMock(return_value=mock_result)
+
+    result = self.navigator.appointment_navigation()
+    
+    # Assert the result is 0 since no appointments are available
+    self.assertEqual(result, mock_result)
+
+    # Ensure extract_appointments() was called during test
+    self.mock_extractor.extract_appointments.assert_called_once()
+    self.navigator.other_appointment_date_ranges.assert_called_once_with(mock_result)
 
 
 if __name__ == "__main__":
