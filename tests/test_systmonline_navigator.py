@@ -86,6 +86,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
 
     # Ensure extract_appointments() was called during test
     self.mock_extractor.extract_appointments.assert_called_once()
+    self.navigator.other_appointment_date_ranges.assert_called_once()
 
 
 if __name__ == "__main__":
