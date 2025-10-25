@@ -6,6 +6,8 @@ class AppointmentExtractor:
     self.driver = driver
 
   def extract_appointments(self):
+    # print("C: Extract appts") # DEBUGGING
+    
     # Find the table names for each table
     # tables = self.driver.find_elements(By.TAG_NAME, "table")
     # for i, table in enumerate(tables):

@@ -36,13 +36,17 @@ class SystmOnlineNavigator:
         raise Exception("Failed login attempt. Please check your username and password in the .env file")
 
   def appointment_navigation(self):
-      appt_status = self.extractor.extract_appointments() # Extracts first two weeks appointment data (approx)
+      # print("B: Appt navigation") # DEBUGGING
+      appt_status = self.extractor.extract_appointments() # Extracts first date range appointment data (approx. two weeks)
       appt_data = self.other_appointment_date_ranges(appt_status)
+      
+      # print("Appt status:", appt_status) # DEBUGGING
+      # print("Appt data:", appt_data) # DEBUGGING
+      
       # No available appointments
-      if appt_status == []:
-          return 0
-      else:
-        return appt_data
+      if not appt_data:
+          return []
+      return appt_data
   
   def click_book_appointment(self):
     visible_button = next(
@@ -51,10 +55,12 @@ class SystmOnlineNavigator:
       ) if btn.is_displayed()
     )
     visible_button.click()
+    # print("A: click book appt") # DEBUGGING
     time.sleep(randint(1,5))
 
   # Select available appointments for the next set of 2 weeks (approx)  
   def other_appointment_date_ranges(self, appt_data):
+    # print("D: Other date ranges") # DEBUGGING
     # return 0 if no appointments
     try:
       select = Select(self.driver.find_element(By.NAME, "StartDate"))
@@ -71,14 +77,18 @@ class SystmOnlineNavigator:
         # Extracts first two weeks appointment data (approx) excluding headers
         appt_data += self.extractor.extract_appointments()
       
+      # print("Extract appt data (C)", appt_data) # DEBUGGING
+      
+      # Return to first date range
       select = Select(self.driver.find_element(By.NAME, "StartDate"))
       select.select_by_index(0)      
       time.sleep(randint(1, 2))
       self.driver.find_element(By.ID, "button").click()
       time.sleep(randint(1, 2))
-
-    except NoSuchElementException:
-       return 0
+      
+      # print("D: Return to 2nd half of D: 1st date range re-selected") # DEBUGGING
+      return appt_data
     
-    return appt_data
-  
+    except NoSuchElementException:
+      # print("E: Other - No element exception") # DEBUGGING
+      return []

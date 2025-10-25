@@ -24,6 +24,7 @@ class GPAppointmentChecker:
     self.file_manager = FileManager()
     self.email_manager = EmailManager()
     self.no_appts = "There are currently no available appointments at "
+    self.email_content_title = "Here are the available appointments at "
     
   def run(self):
     try:
@@ -46,12 +47,11 @@ class GPAppointmentChecker:
       self.systmonline_navigator.click_book_appointment()
       while True:
         appt_data = self.systmonline_navigator.appointment_navigation()     
-        # error during loop -----------------------------------------
-        appt_content = self.file_manager.save_appointment_data(surgery_address, appt_data)
-        if appt_data == 0:
+        if appt_data == []:
           self.email_manager.send_email("", no_appt_text, no_appt_text)
         else:
-          self.email_manager.send_email(appt_content)
+          appt_content = self.file_manager.save_appointment_data(surgery_address, appt_data)
+          self.email_manager.send_email(appt_content, self.email_content_title + surgery_address)
         hour = datetime.now().hour
         time.sleep(delay_time)
         if hour < start_time or hour > end_time: 
