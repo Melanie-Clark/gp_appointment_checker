@@ -28,7 +28,11 @@ class SystmOnlineNavigator:
     if error_span:
         file_manager.log_error(error_span[0].text.strip())
         self.driver.quit()
-        email_manager.send_email("", "There has been a failed login attempt to SystmOnline. Please check your username and password in the .env file", "SystmOnline failed login attempt")
+        email_manager.send_email(
+           "", 
+           "There has been a failed login attempt to SystmOnline. Please check your username and password in the .env file", 
+           "SystmOnline failed login attempt"
+        )
         raise Exception("Failed login attempt. Please check your username and password in the .env file")
 
   def appointment_navigation(self):
@@ -45,7 +49,11 @@ class SystmOnlineNavigator:
       return appt_data
   
   def click_book_appointment(self):
-    visible_button = next(btn for btn in self.driver.find_elements(By.XPATH, "//button[normalize-space(text())='Book Appointment']") if btn.is_displayed())
+    visible_button = next(
+       btn for btn in self.driver.find_elements(
+        By.XPATH, "//button[normalize-space(text())='Book Appointment']"
+      ) if btn.is_displayed()
+    )
     visible_button.click()
     # print("A: click book appt") # DEBUGGING
     time.sleep(randint(1,5))
