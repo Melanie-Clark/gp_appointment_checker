@@ -27,7 +27,7 @@ class SurgeryInfoExtractor:
       # TD 1 contains the surgery name & address
       if len(td_elements) > 1:
         address = td_elements[1].text.strip()
-        print("Surgery Address:", address)
+        # print("Surgery Address:", address) # DEBUGGING
         return address
       else:
         print("Could not find surgery name.")
