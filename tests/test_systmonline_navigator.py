@@ -17,7 +17,8 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     self.mock_driver = MagicMock()         # MagicMock fakes the driver
     self.file_manager = MagicMock()
     self.email_manager = MagicMock()      # Prevents live e-mails being sent
-    self.navigator = SystmOnlineNavigator(self.mock_driver, extractor=None)
+    self.mock_extractor = MagicMock()
+    self.navigator = SystmOnlineNavigator(self.mock_driver, self.mock_extractor)
 
   # ---------------LOGIN----------------------
   # Test wrong username/password - failed login
@@ -68,6 +69,23 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     self.navigator.click_book_appointment()
     # Verify click() was called on the button
     mock_button.click.assert_called_once()
+    
+  # ---------------APPOINTMENT NAVIGATION----------------------
+  # No appointments available
+  # other_appt_date_ranges from appointment_navigation() will have a separate test for the i/o, so mock in this scenario
+  def test_appointment_navigation_no_appointments(self):
+    self.mock_extractor.extract_appointments.return_value = []
+    
+    # Mock the helper function to avoid Selenium calls
+    self.navigator.other_appointment_date_ranges = MagicMock(return_value=[])
+
+    result = self.navigator.appointment_navigation()
+
+    # Assert the result is 0 since no appointments are available
+    self.assertEqual(result, 0)
+
+    # Ensure extract_appointments() was called during test
+    self.mock_extractor.extract_appointments.assert_called_once()
 
 
 if __name__ == "__main__":
