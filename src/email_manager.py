@@ -9,10 +9,10 @@ class EmailManager:
       self.file_manager = FileManager()
       self.config = Config()
 
-  def send_email(self, content, content_title="Here are the available appointments at ", title="🩺 Available GP Appointments"):
+  def send_email(self, content, email_content_title, title="🩺 Available GP Appointments"):
     # Clean text to prevent newlines in headers
     clean_title = title.replace("\r", " ").replace("\n", " ").strip()
-    clean_content_title = content_title.replace("\r", " ").replace("\n", " ").strip()
+    clean_content_title = email_content_title.replace("\r", " ").replace("\n", " ").strip()
 
     # HTML-safe versions (for the body)
     html_address = content

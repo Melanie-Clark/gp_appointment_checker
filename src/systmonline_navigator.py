@@ -72,6 +72,7 @@ class SystmOnlineNavigator:
       print("Extract appt data (C)", appt_data)
       
       # Return to first date range
+      select = Select(self.driver.find_element(By.NAME, "StartDate"))
       select.select_by_index(0)      
       time.sleep(randint(1, 2))
       self.driver.find_element(By.ID, "button").click()
