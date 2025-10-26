@@ -22,7 +22,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     self.mock_extractor = MagicMock()
     self.navigator = SystmOnlineNavigator(self.mock_driver, self.mock_extractor)
 
-  # ---------------LOGIN-------------------------------------------------------------------------------------
+  # --------------- LOGIN TESTS -------------------------------------------------------------------------------------
   # Test wrong username/password - failed login
   def test_login_failure(self):
     # Fakes the HTML element that would appear on login failure
@@ -52,7 +52,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
       # Fail the test if ANY exception is raised
       self.fail(f"login() raised an unexpected exception: {e}")
 
-  # ---------------BOOK APPOINTMENTS--------------------------------------------------------------------------
+  # --------------- BOOK APPOINTMENTS TESTS --------------------------------------------------------------------------
   # Simulates no visible 'Book Appointment' button
   def test_click_book_appointment_no_visible_button(self):
     self.mock_driver.find_elements.return_value = []
@@ -72,7 +72,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     # Verify click() was called on the button
     mock_button.click.assert_called_once()
     
-  # ---------------APPOINTMENT NAVIGATION---------------------------------------------------------------------
+  # --------------- APPOINTMENT NAVIGATION TESTS ---------------------------------------------------------------------
   # mock appointments for appointment_navigation() tests
   @staticmethod
   def _mock_appointments(date1="Saturday 25th Oct 2025", date2 = "Thursday 30th Oct 2025"):
@@ -115,7 +115,6 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     self.navigator.other_appointment_date_ranges = MagicMock(return_value=mock_result)
 
     result = self.navigator.appointment_navigation()
-    
     self.assertEqual(result, mock_result)
 
     self.mock_extractor.extract_appointments.assert_called_once()
@@ -135,7 +134,20 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     self.mock_extractor.extract_appointments.assert_called_once()
     self.navigator.other_appointment_date_ranges.assert_called_once_with(mock_result1)
     
-  # ---------------OTHER APPT DATE RANGES--------------------------------------------------------------------- 
+  # --------------- OTHER APPT DATE RANGES TESTS --------------------------------------------------------------------- 
+  def _mock_select_and_button(self, mock_select_class, num_options):
+    self.mock_extractor.reset_mock()
+        
+    # Mock dropdown select element and date range options
+    mock_select = MagicMock()
+    mock_select.options = [MagicMock() for _ in range(num_options)] # number of drop-down date range options
+    mock_select_class.return_value = mock_select # This is how to control what a mocked class returns when instantiated - linked to Patch
+    
+    mock_button = MagicMock()
+    self.mock_driver.find_element.return_value = mock_button
+    
+    return mock_select, mock_button  
+  
   # FAIL: Exception raised when no appointments found
   def test_other_appointment_date_ranges_no_drop_down_element(self):
     # side_effect allows the mock to raise an exception when called
@@ -148,15 +160,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
   # @patch - decorator that temporarily replaces a real object/method with a mock version during the test
   @patch('systmonline_navigator.Select')
   def test_other_appointment_date_ranges_with_initial_and_other_appointments(self, mock_select_class): 
-    self.mock_extractor.reset_mock()
-    
-    # Mock dropdown select element and date range options
-    mock_select = MagicMock()
-    mock_select.options = [MagicMock(), MagicMock(), MagicMock()] # 3 drop-down date range options   
-    mock_select_class.return_value = mock_select  # This is how to control what a mocked class returns when instantiated - linked to Patch
-    
-    mock_button = MagicMock()
-    self.mock_driver.find_element.return_value = mock_button
+    mock_select, mock_button = self._mock_select_and_button(mock_select_class, num_options=3)
     
     initial_appointments = self._mock_appointments()
     appts_range2 = self._mock_appointments("Saturday 15th Nov 2025", "Thursday 20th Nov 2025")
@@ -167,7 +171,6 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     
     # if using iniitial_appointments, it mutates inside other_appointment_date_ranges, and uses the same list object in memory 
     result = self.navigator.other_appointment_date_ranges(initial_appointments.copy())
-    
     expected = initial_appointments + appts_range2 + appts_range3
     self.assertEqual(result, expected)
     
@@ -180,19 +183,66 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     # - Twice for the two "other" date ranges (index 1 and 2)
     # - Once to return to the first range (index 0)
     self.assertEqual(mock_button.click.call_count, len(mock_select.options))
-      
     
-    # select = Select(self.driver.find_element(By.NAME, "StartDate"))
+  # SUCCESS: Extract additional appointments from other date ranges with no initial appointments
+  @patch('systmonline_navigator.Select')
+  def test_other_appointment_date_ranges_with_other_appointments_only(self, mock_select_class): 
+    mock_select, mock_button = self._mock_select_and_button(mock_select_class, num_options=3)
+    
+    initial_appointments = []
+    appts_range2 = self._mock_appointments("Saturday 15th Nov 2025", "Thursday 20th Nov 2025")
+    appts_range3 = []
+    
+    self.mock_extractor.extract_appointments.side_effect = [appts_range2, appts_range3]
+    
+    result = self.navigator.other_appointment_date_ranges(initial_appointments.copy())
+    expected = initial_appointments + appts_range2 + appts_range3
+    self.assertEqual(result, expected)
+    
+    mock_select.select_by_index.assert_any_call(1)
+    mock_select.select_by_index.assert_any_call(2)
+    mock_select.select_by_index.assert_any_call(0)
+      
+    self.assertEqual(mock_button.click.call_count, len(mock_select.options))  
   
-    # for i in range(1,len(select.options)):  
-    #   select.select_by_index(i)
-    #   self.driver.find_element(By.ID, "button").click()
-
-    #   appt_data += self.extractor.extract_appointments()
-    # return appt_data
-
+  # SUCCESS: Extract initial appointments, no other available appointments
+  @patch('systmonline_navigator.Select')
+  def test_other_appointment_date_ranges_with_initial_appointments_only(self, mock_select_class): 
+    mock_select, mock_button = self._mock_select_and_button(mock_select_class, num_options=2)
+    
+    initial_appointments = self._mock_appointments()
+    appts_range2 = []
+    
+    self.mock_extractor.extract_appointments.side_effect = [appts_range2]
+    
+    result = self.navigator.other_appointment_date_ranges(initial_appointments.copy())
+    expected = initial_appointments + appts_range2
+    self.assertEqual(result, expected)
+    
+    mock_select.select_by_index.assert_any_call(1)
+    mock_select.select_by_index.assert_any_call(0)
+      
+    self.assertEqual(mock_button.click.call_count, len(mock_select.options))  
+    
+  # SUCCESS: No appointments
+  @patch('systmonline_navigator.Select')
+  def test_other_appointment_date_ranges_no_appointments(self, mock_select_class): 
+    mock_select, mock_button = self._mock_select_and_button(mock_select_class, num_options=2)
+    
+    initial_appointments = []
+    appts_range2 = []
+    
+    self.mock_extractor.extract_appointments.side_effect = [appts_range2]
+    
+    result = self.navigator.other_appointment_date_ranges(initial_appointments.copy())
+    expected = initial_appointments + appts_range2
+    self.assertEqual(result, expected)
+    
+    mock_select.select_by_index.assert_any_call(1)
+    mock_select.select_by_index.assert_any_call(0)
+      
+    self.assertEqual(mock_button.click.call_count, len(mock_select.options))  
   
         
-
 if __name__ == "__main__":
     unittest.main()
