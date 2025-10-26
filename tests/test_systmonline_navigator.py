@@ -1,6 +1,7 @@
 import unittest
 import sys
 import os
+from selenium.common.exceptions import NoSuchElementException
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
@@ -20,7 +21,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     self.mock_extractor = MagicMock()
     self.navigator = SystmOnlineNavigator(self.mock_driver, self.mock_extractor)
 
-  # ---------------LOGIN----------------------
+  # ---------------LOGIN-------------------------------------------------------------------------------------
   # Test wrong username/password - failed login
   def test_login_failure(self):
     # Fakes the HTML element that would appear on login failure
@@ -51,7 +52,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
       # Fail the test if ANY exception is raised
       self.fail(f"login() raised an unexpected exception: {e}")
 
-  # ---------------BOOK APPOINTMENTS----------------------
+  # ---------------BOOK APPOINTMENTS--------------------------------------------------------------------------
   # Simulates no visible 'Book Appointment' button
   def test_click_book_appointment_no_visible_button(self):
     self.mock_driver.find_elements.return_value = []
@@ -71,7 +72,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     # Verify click() was called on the button
     mock_button.click.assert_called_once()
     
-  # ---------------APPOINTMENT NAVIGATION----------------------
+  # ---------------APPOINTMENT NAVIGATION---------------------------------------------------------------------
   # mock appointments for appointment_navigation() tests
   @staticmethod
   def _mock_appointments(date1="Saturday 25th Oct 2025", date2 = "Thursday 30th Oct 2025"):
@@ -136,6 +137,18 @@ class TestSystmOnlineNavigator(unittest.TestCase):
     self.mock_extractor.extract_appointments.assert_called_once()
     self.navigator.other_appointment_date_ranges.assert_called_once_with(mock_result1)
     
+  # ---------------OTHER APPT DATE RANGES--------------------------------------------------------------------- 
+  # FAIL: Exception raised when no appointments found
+  def test_other_appointment_date_ranges_no_other_appointments(self):
+    # side_effect allows the mock to raise an exception when called
+    self.mock_driver.find_element.side_effect = NoSuchElementException()
+
+    result = self.navigator.other_appointment_date_ranges([])
+    
+    self.assertEqual(result, []) 
+  
+
+        
 
 if __name__ == "__main__":
     unittest.main()
