@@ -61,7 +61,7 @@ class SystmOnlineNavigator:
   # Select available appointments for the next set of 2 weeks (approx)  
   def other_appointment_date_ranges(self, appt_data):
     # print("D: Other date ranges") # DEBUGGING
-    # return 0 if no appointments
+    # return [] if no appointments
     try:
       select = Select(self.driver.find_element(By.NAME, "StartDate"))
     
