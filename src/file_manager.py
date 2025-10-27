@@ -9,7 +9,7 @@ from config import Config
 # Manages saving data/logs to file and tabular formatting
 class FileManager:
   def save_appointment_data(self, surgery_address, appt_data):
-    if appt_data != 0:
+    if appt_data:
       html_table = self.table_formatter(appt_data)
 
       with open(Config.APPT_FILE, 'w') as file:

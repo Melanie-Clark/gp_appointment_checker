@@ -14,18 +14,12 @@ class EmailManager:
     clean_title = title.replace("\r", " ").replace("\n", " ").strip()
     clean_content_title = email_content_title.replace("\r", " ").replace("\n", " ").strip()
 
-    # HTML-safe versions (for the body)
-    html_address = content
-    html_content = content.replace("\r", "").replace("\n", "<br>").strip()
-    html_content_title = clean_content_title.replace("\n", "<br>")
-
     # HTML clean body - user view
     html_body = f"""
     <html>
       <body>
-        <p>{html_content_title}</p>
-        <p>{html_address}</p>
-        <div><strong>{html_content}</strong></div>
+        <p>{clean_content_title}</p>
+        {content}
       </body>
     </html>
     """
