@@ -14,10 +14,9 @@ class TestSystmOnlineNavigator(unittest.TestCase):
   def setUp(self):
     """
     This runs before every test, avoiding object creation repeition in each test - creates fresh mock objects for the 
-    driver, file_manager, and email_manager to isolate tests from real browser or emails.
+    driver, and email_manager to isolate tests from real browser or emails.
     """
     self.mock_driver = MagicMock()         # MagicMock fakes the driver
-    self.file_manager = MagicMock()
     self.email_manager = MagicMock()      # Prevents live e-mails being sent
     self.mock_extractor = MagicMock()
     self.navigator = SystmOnlineNavigator(self.mock_driver, self.mock_extractor)
@@ -36,7 +35,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
 
     # Expect an exception - raise Exception("Failed login attempt...") because the login “failed”
     with self.assertRaises(Exception) as context:
-        self.navigator.login(self.file_manager, self.email_manager)
+        self.navigator.login(self.email_manager)
 
     # Confirms the exception message is as expected - test passes
     self.assertIn("Failed login attempt", str(context.exception))
@@ -47,7 +46,7 @@ class TestSystmOnlineNavigator(unittest.TestCase):
 
     try:
       # Run the login method. If login() runs without raising an exception => success.
-      self.navigator.login(self.file_manager, self.email_manager)
+      self.navigator.login(self.email_manager)
     except Exception as e:
       # Fail the test if ANY exception is raised
       self.fail(f"login() raised an unexpected exception: {e}")

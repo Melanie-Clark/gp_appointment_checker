@@ -1,13 +1,12 @@
 import time
-import traceback
-
 from datetime import datetime
+import traceback
 
 from config import Config
 from browser_manager import BrowserManager
 from appointment_extractor import AppointmentExtractor
 from systmonline_navigator import SystmOnlineNavigator
-from file_manager import FileManager
+from table_formatter import TableFormatter
 from email_manager import EmailManager
 from surgery_info_extractor import SurgeryInfoExtractor
 
@@ -21,7 +20,7 @@ class GPAppointmentChecker:
     self.extractor = AppointmentExtractor(self.driver)
     self.systmonline_navigator = SystmOnlineNavigator(self.driver, self.extractor)
     self.surgery_info = SurgeryInfoExtractor(self.driver)
-    self.file_manager = FileManager()
+    self.table_formatter = TableFormatter()
     self.email_manager = EmailManager()
     self.no_appts = "There are currently no available appointments at "
     self.email_content_title = "Here are the available appointments at "
@@ -40,17 +39,18 @@ class GPAppointmentChecker:
       delay_time = 60
     
       self.config.validate()
-      self.systmonline_navigator.login(self.file_manager, self.email_manager)
+      self.systmonline_navigator.login(self.email_manager)
       surgery_address = self.surgery_info.extract_address()
 
       no_appt_text = self.no_appts + surgery_address
       self.systmonline_navigator.click_book_appointment()
+      
       while True:
         appt_data = self.systmonline_navigator.appointment_navigation()     
         if appt_data == []:
           self.email_manager.send_email("", no_appt_text, no_appt_text)
         else:
-          appt_content = self.file_manager.save_appointment_data(surgery_address, appt_data)
+          appt_content = self.table_formatter.table_formatter(appt_data)
           self.email_manager.send_email(appt_content, self.email_content_title + surgery_address)
         hour = datetime.now().hour
         time.sleep(delay_time)
@@ -58,7 +58,7 @@ class GPAppointmentChecker:
           return False
         
     except Exception as e:
-      self.file_manager.log_error(f"General Exception: {str(e)}")
+      print(f"ERROR: {e}")
       traceback.print_exc()
     finally:
       self.driver.quit()
