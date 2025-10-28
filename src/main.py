@@ -30,8 +30,8 @@ class GPAppointmentChecker:
       # Skip if out of hours (before 8am or after 6pm) -----------
       # It's recommended to check for short periods frequently, or less frequent over a longer time frame
       hour = datetime.now().hour
-      start_time = 8 
-      end_time = 23
+      start_time = 8
+      end_time = 17
       if hour < start_time or hour > end_time:  # changed for testing purposes
         print("GP Appointment Checker has been run outside of configured hours. Update the hours in main.py or run during configured hours.")
         return
@@ -45,7 +45,12 @@ class GPAppointmentChecker:
       no_appt_text = self.no_appts + surgery_address
       self.systmonline_navigator.click_book_appointment()
       
-      while True:
+      n = 0
+      minutes = 10 # How many minutes to check for appointments - Please be kind to the server!
+      
+      
+      # ACTION:==== ONLY SEND 2ND+ E-MAIL IF CHANGE SINCE LAST E-MAIL===================
+      while n < minutes:
         appt_data = self.systmonline_navigator.appointment_navigation()     
         if appt_data == []:
           self.email_manager.send_email("", no_appt_text, no_appt_text)
@@ -54,8 +59,9 @@ class GPAppointmentChecker:
           self.email_manager.send_email(appt_content, self.email_content_title + surgery_address)
         hour = datetime.now().hour
         time.sleep(delay_time)
+        n += 1
         if hour < start_time or hour > end_time: 
-          return False
+          return False  
         
     except Exception as e:
       print(f"ERROR: {e}")
