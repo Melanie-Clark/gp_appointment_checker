@@ -1,13 +1,12 @@
 import time
-import traceback
-
 from datetime import datetime
+import traceback
 
 from config import Config
 from browser_manager import BrowserManager
 from appointment_extractor import AppointmentExtractor
 from systmonline_navigator import SystmOnlineNavigator
-from file_manager import FileManager
+from table_formatter import TableFormatter
 from email_manager import EmailManager
 from surgery_info_extractor import SurgeryInfoExtractor
 
@@ -21,7 +20,7 @@ class GPAppointmentChecker:
     self.extractor = AppointmentExtractor(self.driver)
     self.systmonline_navigator = SystmOnlineNavigator(self.driver, self.extractor)
     self.surgery_info = SurgeryInfoExtractor(self.driver)
-    self.file_manager = FileManager()
+    self.table_formatter = TableFormatter()
     self.email_manager = EmailManager()
     self.no_appts = "There are currently no available appointments at "
     self.email_content_title = "Here are the available appointments at "
@@ -31,8 +30,8 @@ class GPAppointmentChecker:
       # Skip if out of hours (before 8am or after 6pm) -----------
       # It's recommended to check for short periods frequently, or less frequent over a longer time frame
       hour = datetime.now().hour
-      start_time = 8 
-      end_time = 23
+      start_time = 8
+      end_time = 17
       if hour < start_time or hour > end_time:  # changed for testing purposes
         print("GP Appointment Checker has been run outside of configured hours. Update the hours in main.py or run during configured hours.")
         return
@@ -40,25 +39,32 @@ class GPAppointmentChecker:
       delay_time = 60
     
       self.config.validate()
-      self.systmonline_navigator.login(self.file_manager, self.email_manager)
+      self.systmonline_navigator.login(self.email_manager)
       surgery_address = self.surgery_info.extract_address()
 
       no_appt_text = self.no_appts + surgery_address
       self.systmonline_navigator.click_book_appointment()
-      while True:
+      
+      n = 0
+      minutes = 10 # How many minutes to check for appointments - Please be kind to the server!
+      
+      
+      # ACTION:==== ONLY SEND 2ND+ E-MAIL IF CHANGE SINCE LAST E-MAIL===================
+      while n < minutes:
         appt_data = self.systmonline_navigator.appointment_navigation()     
         if appt_data == []:
           self.email_manager.send_email("", no_appt_text, no_appt_text)
         else:
-          appt_content = self.file_manager.save_appointment_data(surgery_address, appt_data)
+          appt_content = self.table_formatter.table_formatter(appt_data)
           self.email_manager.send_email(appt_content, self.email_content_title + surgery_address)
         hour = datetime.now().hour
         time.sleep(delay_time)
+        n += 1
         if hour < start_time or hour > end_time: 
-          return False
+          return False  
         
     except Exception as e:
-      self.file_manager.log_error(f"General Exception: {str(e)}")
+      print(f"ERROR: {e}")
       traceback.print_exc()
     finally:
       self.driver.quit()

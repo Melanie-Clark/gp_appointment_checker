@@ -11,9 +11,6 @@ class Config:
   EMAIL_FROM = os.getenv('EMAIL_FROM')
   EMAIL_TO = os.getenv('EMAIL_TO')
   EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
-
-  APPT_FILE = '/tmp/available_appointments.txt'
-  LOG_FILE = '/tmp/systm_log.txt'
   
   @classmethod
   def validate(cls):
